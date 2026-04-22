@@ -1,7 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}新增物件 - 校園遺失物查詢系統{% endblock %}
+{% block title %}
+    {{ '登記遺失物' if form_type == 'lost' else '登記拾獲物' }} - 校園遺失物查詢系統
+{% endblock %}
 
 {% block content %}
-    <!-- form content placeholder -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-{{ 'warning text-dark' if form_type == 'lost' else 'success text-white' }}">
+                <h4 class="mb-0">{{ '📝 登記遺失物 (我弄丟東西了)' if form_type == 'lost' else '💡 登記拾獲物 (我撿到東西了)' }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data" action="{{ url_for('lost.new_lost_item') if form_type == 'lost' else url_for('found.new_found_item') }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label text-danger fw-bold">* 物品名稱</label>
+                        <input type="text" class="form-control" id="title" name="title" required placeholder="例如：黑色的 iPhone 13">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="location" class="form-label text-danger fw-bold">* {{ '遺失地點' if form_type == 'lost' else '拾獲地點' }}</label>
+                        <input type="text" class="form-control" id="location" name="location" required placeholder="例如：圖書館三樓">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="item_date" class="form-label">{{ '遺失日期' if form_type == 'lost' else '拾獲日期' }}</label>
+                        <input type="date" class="form-control" id="item_date" name="item_date">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">特徵/詳細描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="請詳細描述外觀、特徵、裡面有什麼東西等..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="contact_info" class="form-label">聯絡方式</label>
+                        <input type="text" class="form-control" id="contact_info" name="contact_info" placeholder="請填寫 IG 帳號或 Email 讓對方可以聯繫你">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="image" class="form-label">上傳照片</label>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-{{ 'warning' if form_type == 'lost' else 'success' }} btn-lg">確認登記</button>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">取消並返回首頁</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

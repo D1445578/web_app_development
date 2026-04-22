@@ -3,5 +3,95 @@
 {% block title %}首頁 - 校園遺失物查詢系統{% endblock %}
 
 {% block content %}
-    <!-- index content placeholder -->
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2>物品列表</h2>
+    </div>
+    <div class="col-md-6">
+        <form action="{{ url_for('main.search') }}" method="GET" class="d-flex">
+            <select name="type" class="form-select me-2" style="max-width: 150px;">
+                <option value="">全部類型</option>
+                <option value="lost" {% if current_type == 'lost' %}selected{% endif %}>列出遺失物</option>
+                <option value="found" {% if current_type == 'found' %}selected{% endif %}>列出拾獲物</option>
+            </select>
+            <input class="form-control me-2" type="search" name="q" placeholder="搜尋物品名稱或地點..." value="{{ search_query or '' }}">
+            <button class="btn btn-outline-success" type="submit">搜尋</button>
+        </form>
+    </div>
+</div>
+
+{% set lost_items = items | selectattr("item_type", "equalto", "lost") | list %}
+{% set found_items = items | selectattr("item_type", "equalto", "found") | list %}
+
+{% if not current_type or current_type == 'lost' %}
+<div class="mb-5">
+    <h4 class="border-bottom pb-2 mb-3 text-warning border-warning" style="border-width: 3px !important;">
+        🕵️ 遺失物專區 <small class="text-muted fs-6">(大家正在尋找的物品)</small>
+    </h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for item in lost_items %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-warning">
+                {% if item.image_path %}
+                    <img src="{{ url_for('static', filename=item.image_path) }}" class="card-img-top" alt="{{ item.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span>無圖片</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-warning text-dark mb-2">尋找中 (遺失)</span>
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text text-truncate">{{ item.description or '無描述' }}</p>
+                    <p class="card-text"><small class="text-muted">失蹤地點: {{ item.location }}</small></p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 pb-3 text-center">
+                    <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="btn btn-outline-warning text-dark w-100">提供線索 / 查看詳情</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-4 bg-light rounded">
+            <span class="text-muted">目前沒有刊登中的遺失物</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if not current_type or current_type == 'found' %}
+<div class="mb-5">
+    <h4 class="border-bottom pb-2 mb-3 text-success border-success" style="border-width: 3px !important;">
+        💡 拾獲物專區 <small class="text-muted fs-6">(等待主人領回的物品)</small>
+    </h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for item in found_items %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-success">
+                {% if item.image_path %}
+                    <img src="{{ url_for('static', filename=item.image_path) }}" class="card-img-top" alt="{{ item.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span>無圖片</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-success mb-2">招領中 (拾獲)</span>
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text text-truncate">{{ item.description or '無描述' }}</p>
+                    <p class="card-text"><small class="text-muted">拾獲地點: {{ item.location }}</small></p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 pb-3 text-center">
+                    <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="btn btn-outline-success w-100">這是我的 / 查看詳情</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-4 bg-light rounded">
+            <span class="text-muted">目前沒有刊登中的拾獲物</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

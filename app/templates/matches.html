@@ -1,7 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}比對結果 - 校園遺失物查詢系統{% endblock %}
+{% block title %}比對建議: {{ item.title }} - 校園遺失物查詢系統{% endblock %}
 
 {% block content %}
-    <!-- matches content placeholder -->
+<div class="mb-4">
+    <a href="{{ url_for('main.item_detail', item_id=item.id) }}" class="btn btn-outline-secondary btn-sm mb-3">← 返回物品詳情</a>
+    <h3>🔍 系統比對建議</h3>
+    <p class="text-muted">我們根據您登記的 <strong>{{ item.title }}</strong> 自動為您篩選可能相符的{{ '拾獲物' if item.item_type == 'lost' else '遺失物' }}。</p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for match in matches %}
+    <div class="col">
+        <div class="card h-100 shadow-sm border-{{ 'warning' if match.item_type == 'lost' else 'success' }}">
+            {% if match.image_path %}
+                <img src="{{ url_for('static', filename=match.image_path) }}" class="card-img-top" alt="{{ match.title }}" style="height: 150px; object-fit: cover;">
+            {% else %}
+                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <span>無圖片</span>
+                </div>
+            {% endif %}
+            <div class="card-body p-3">
+                <h6 class="card-title">{{ match.title }}</h6>
+                <p class="card-text small text-muted mb-1">地點: {{ match.location }}</p>
+                <a href="{{ url_for('main.item_detail', item_id=match.id) }}" class="btn btn-outline-primary btn-sm w-100 mt-2">查看詳情</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 border rounded bg-white">
+        <h5 class="text-muted mb-3">目前沒有找到高度相符的推薦 😢</h5>
+        <p>如果有人登記了相符的物品，它就會出現在這裡。</p>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}

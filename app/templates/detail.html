@@ -1,7 +1,51 @@
 {% extends "base.html" %}
 
-{% block title %}物件詳情 - 校園遺失物查詢系統{% endblock %}
+{% block title %}{{ item.title }} - 校園遺失物查詢系統{% endblock %}
 
 {% block content %}
-    <!-- detail content placeholder -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        {% if item.image_path %}
+            <img src="{{ url_for('static', filename=item.image_path) }}" class="img-fluid rounded shadow w-100" alt="{{ item.title }}" style="max-height: 500px; object-fit: contain; background: #e9ecef;">
+        {% else %}
+            <div class="rounded shadow bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 400px;">
+                <h2>未提供圖片</h2>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">首頁</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ item.title }}</li>
+            </ol>
+        </nav>
+        
+        <h2>{{ item.title }}</h2>
+        <span class="badge bg-{{ 'warning text-dark' if item.item_type == 'lost' else 'success' }} rounded-pill mb-3 px-3 py-2 fs-6">
+            {{ '尋找中 (遺失物)' if item.item_type == 'lost' else '招領中 (拾獲物)' }}
+        </span>
+
+        <h5 class="mt-4 border-bottom pb-2">📂 詳細資訊</h5>
+        <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item bg-transparent px-0"><strong>地點：</strong> {{ item.location }}</li>
+            <li class="list-group-item bg-transparent px-0"><strong>日期：</strong> {{ item.item_date or '未提供' }}</li>
+            <li class="list-group-item bg-transparent px-0"><strong>特徵說明：</strong><br> {{ item.description or '無詳細描述' }}</li>
+            <li class="list-group-item bg-transparent px-0"><strong>狀態：</strong> {{ '處理中' if item.status == 'open' else '已結案' }}</li>
+            <li class="list-group-item bg-transparent px-0 text-muted"><small>發布時間：{{ item.created_at }}</small></li>
+        </ul>
+
+        <div class="alert alert-info shadow-sm">
+            <h5 class="alert-heading">📬 聯絡方式</h5>
+            <p class="mb-0">{{ item.contact_info or '發布者未提供聯絡方式，請聯絡學校生輔組。' }}</p>
+        </div>
+
+        <div class="mt-4 pt-3 border-top">
+            <a href="{{ url_for('main.item_matches', item_id=item.id) }}" class="btn btn-outline-primary shadow-sm">
+                🔍 系統比對建議 (尋找可能的配對)
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}
